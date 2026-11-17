@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#202124">
+  <title>SEARCH Browser</title>
+  <style>
+    :root{
+      --bg:#202124;--panel:#292a2d;--panel2:#303134;--line:#3c4043;
+      --text:#e8eaed;--muted:#9aa0a6;--blue:#8ab4f8;--shadow:0 8px 28px #0005;
+      --mirsad:#15191d;--worth:#17191d;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Arial,"SF Pro Display",sans-serif}
+    body{min-height:100vh;overflow-x:hidden}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .browser{min-height:100vh;display:flex;flex-direction:column}
+    .top{background:#202124;border-bottom:1px solid #171717}
+    .tabbar{height:43px;display:flex;align-items:end;padding:7px 12px 0;gap:8px;background:#17181a}
+    .tab{height:36px;min-width:180px;max-width:260px;border-radius:10px 10px 0 0;background:#292a2d;display:flex;align-items:center;gap:9px;padding:0 13px;color:#e8eaed;font-size:13px}
+    .tab-dot{width:13px;height:13px;border-radius:50%;background:conic-gradient(#4285f4 0 25%,#34a853 0 50%,#fbbc05 0 75%,#ea4335 0)}
+    .tab-close{margin-right:auto;color:#9aa0a6}
+    .newtab{color:#bdc1c6;background:none;border:0;font-size:22px;padding:0 8px 5px}
+    .toolbar{height:54px;display:flex;align-items:center;gap:8px;padding:7px 14px;background:#292a2d}
+    .navbtn{width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#bdc1c6;font-size:19px;display:grid;place-items:center}
+    .navbtn:hover,.toolbtn:hover{background:#3c4043}
+    .address{height:38px;flex:1;min-width:90px;border-radius:22px;background:#202124;display:flex;align-items:center;padding:0 13px;gap:10px;border:1px solid transparent}
+    .address:focus-within{border-color:#5f6368}
+    .address .lock{color:#9aa0a6;font-size:13px}
+    .address input{width:100%;background:transparent;border:0;outline:0;color:#e8eaed;direction:ltr;text-align:left;font-size:14px}
+    .toolbtn{height:34px;padding:0 11px;border:0;border-radius:18px;background:transparent;color:#bdc1c6;font-size:13px;white-space:nowrap}
+    .main{flex:1;display:grid;grid-template-columns:minmax(220px,260px) minmax(0,1fr) minmax(220px,260px);gap:14px;padding:18px;align-items:stretch}
+    .side{background:var(--panel);border:1px solid var(--line);border-radius:15px;min-height:calc(100vh - 145px);overflow:hidden;display:flex;flex-direction:column}
+    .side-head{padding:17px 16px 13px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700}
+    .brand-mark{width:29px;height:29px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:14px}
+    .mirsad .brand-mark{background:#343b43;color:#dce6f1}
+    .worth .brand-mark{background:#3b3530;color:#f0d5b4}
+    .status{font-size:10px;color:#81c995;background:#20372b;border-radius:20px;padding:5px 8px}
+    .side-body{padding:15px;display:flex;flex-direction:column;gap:12px;flex:1}
+    .hint{font-size:12px;color:var(--muted);line-height:1.8}
+    .field{width:100%;min-height:112px;resize:vertical;background:#202124;border:1px solid #45484d;border-radius:10px;padding:11px;color:var(--text);outline:0;font-size:13px;line-height:1.7}
+    .field:focus{border-color:#8ab4f8}
+    .action{border:0;border-radius:9px;padding:11px 13px;font-size:13px;font-weight:700;color:#202124;background:#d2e3fc}
+    .worth .action{background:#e8d7c2}
+    .result{background:#202124;border:1px solid #3c4043;border-radius:10px;padding:12px;color:#c7cbd1;font-size:12px;line-height:1.8;white-space:pre-wrap;min-height:80px}
+    .center{min-width:0;display:flex;flex-direction:column;align-items:center;padding:clamp(35px,9vh,100px) 14px 30px}
+    .google-word{font-size:clamp(48px,7vw,76px);font-weight:600;letter-spacing:-4px;direction:ltr;line-height:1.15;margin-bottom:28px}
+    .google-word span:nth-child(1),.g-blue{color:#4285f4}.g-red{color:#ea4335}.g-yellow{color:#fbbc05}.g-green{color:#34a853}
+    .search-wrap{width:min(100%,650px);height:52px;border:1px solid #5f6368;border-radius:28px;display:flex;align-items:center;gap:12px;padding:0 17px;background:#202124;box-shadow:0 1px 5px #0002}
+    .search-wrap:hover,.search-wrap:focus-within{background:#303134;box-shadow:0 2px 8px #0005;border-color:transparent}
+    .search-wrap input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#e8eaed;font-size:16px}
+    .search-icon{color:#9aa0a6;font-size:18px}
+    .search-actions{display:flex;gap:10px;margin-top:22px}
+    .search-actions button{background:#303134;border:1px solid #303134;color:#e8eaed;border-radius:5px;padding:10px 16px;font-size:13px}
+    .search-actions button:hover{border-color:#5f6368}
+    .fajwah{width:min(100%,650px);margin-top:45px;background:#fff;color:#202124;border-radius:13px;padding:14px 17px;display:flex;align-items:center;justify-content:space-between;text-decoration:none;box-shadow:var(--shadow);gap:12px}
+    .fajwah strong{font-size:14px}.fajwah small{display:block;color:#5f6368;margin-top:4px;font-size:11px}
+    .fajwah .f-mark{width:35px;height:35px;border-radius:10px;background:#202124;color:white;display:grid;place-items:center;font-weight:bold}
+    .fajwah .open{color:#5f6368;font-size:18px}
+    .results{width:min(100%,760px);margin-top:28px;display:none}
+    .results.active{display:block}
+    .results .gcse-search{color:#202124;background:white;border-radius:12px;padding:12px;min-height:120px}
+    .below-note{font-size:11px;color:#777f89;margin-top:auto;padding-top:36px;text-align:center}
+    .hidden{display:none!important}
+    .main.one-side{grid-template-columns:minmax(0,1fr) 260px}
+    .main.no-sides{grid-template-columns:minmax(0,1fr)}
+    .main.one-side .center,.main.no-sides .center{width:100%}
+    .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#303134;color:#e8eaed;border:1px solid #5f6368;border-radius:20px;padding:10px 15px;font-size:12px;box-shadow:var(--shadow);display:none;z-index:10}
+    .toast.show{display:block}
+    @media(max-width:900px){
+      .main{grid-template-columns:1fr;gap:12px}
+      .center{grid-row:1;padding-top:48px;min-height:430px}
+      .side{min-height:unset}
+      .side-body{padding:12px}
+      .field{min-height:80px}
+      .main.one-side,.main.no-sides{grid-template-columns:1fr}
+      .toolbar{gap:4px;padding:7px}
+      .toolbtn{padding:0 7px}
+    }
+    @media(max-width:480px){
+      .tab{min-width:150px}
+      .main{padding:10px}
+      .address{gap:6px;padding:0 9px}
+      .address input{font-size:12px}
+      .toolbtn{font-size:11px}
+      .google-word{margin-bottom:22px}
+      .fajwah{margin-top:32px}
+    }
+  </style>
+</head>
+<body>
+<div class="browser">
+  <header class="top">
+    <div class="tabbar">
+      <div class="tab"><span class="tab-dot"></span><span>Google</span><span class="tab-close">×</span></div>
+      <button class="newtab" title="علامة تبويب جديدة">+</button>
+    </div>
+    <div class="toolbar">
+      <button class="navbtn" id="back" title="رجوع">‹</button>
+      <button class="navbtn" id="forward" title="تقدم">›</button>
+      <button class="navbtn" id="reload" title="تحديث">↻</button>
+      <div class="address">
+        <span class="lock">ⓘ</span>
+        <input id="urlBar" value="google.com" aria-label="العنوان أو البحث">
+      </div>
+      <button class="toolbtn" id="toggleMirsad">مرصاد</button>
+      <button class="toolbtn" id="toggleWorth">يستحق</button>
+    </div>
+  </header>
+
+  <main class="main" id="main">
+    <aside class="side worth" id="worthPanel">
+      <div class="side-head">
+        <div class="brand"><span class="brand-mark">ي</span><span>يستحق</span></div>
+        <span class="status">جاهز</span>
+      </div>
+      <div class="side-body">
+        <div class="hint">قيّم المحتوى أو الصق النص الذي تريد مراجعته.</div>
+        <textarea class="field" id="worthText" placeholder="ضع النص هنا..."></textarea>
+        <button class="action" id="worthBtn">قيّم المحتوى</button>
+        <div class="result" id="worthResult">بانتظار النص للتحليل.</div>
+      </div>
+    </aside>
+
+    <section class="center">
+      <div class="google-word" aria-label="Google"><span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span></div>
+      <form class="search-wrap" id="searchForm">
+        <span class="search-icon">⌕</span>
+        <input id="searchInput" type="search" placeholder="ابحث في Google أو اكتب عنوان URL" autocomplete="off">
+        <button type="submit" aria-label="بحث" style="border:0;background:transparent;color:#8ab4f8;font-size:18px">⌕</button>
+      </form>
+      <div class="search-actions">
+        <button type="submit" form="searchForm">بحث Google</button>
+        <button type="button" id="lucky">ضربة حظ</button>
+      </div>
+      <a class="fajwah" href="https://fajwah.edgeone.dev" target="_blank" rel="noopener">
+        <span><strong>فجوة</strong><small>افتح منصة فجوة</small></span>
+        <span class="f-mark">ف</span>
+        <span class="open">↗</span>
+      </a>
+      <div class="results" id="results">
+        <div class="gcse-search"></div>
+      </div>
+      <div class="below-note">نموذج أولي لواجهة SEARCH Browser</div>
+    </section>
+
+    <aside class="side mirsad" id="mirsadPanel">
+      <div class="side-head">
+        <div class="brand"><span class="brand-mark">م</span><span>مرصاد</span></div>
+        <span class="status">جاهز</span>
+      </div>
+      <div class="side-body">
+        <div class="hint">افحص الادعاءات والنصوص لرصد مؤشرات التضليل.</div>
+        <textarea class="field" id="mirsadText" placeholder="الصق الخبر أو الادعاء هنا..."></textarea>
+        <button class="action" id="mirsadBtn">افحص بمرصاد</button>
+        <div class="result" id="mirsadResult">بانتظار نص للفحص.</div>
+      </div>
+    </aside>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  // معرّف محرك البحث المخصص الذي زودتني به سابقاً.
+  const GOOGLE_CSE_ID = 'e6b77fd4721cd4ec2';
+
+  const $ = id => document.getElementById(id);
+  const toast = message => {
+    const el = $('toast'); el.textContent = message; el.classList.add('show');
+    clearTimeout(window.toastTimer); window.toastTimer = setTimeout(()=>el.classList.remove('show'),3200);
+  };
+
+  function loadCSE(){
+    if(window.__cseLoading || document.querySelector('script[data-google-cse]')) return;
+    window.__cseLoading = true;
+    const script = document.createElement('script');
+    script.dataset.googleCse = 'true';
+    script.async = true;
+    script.src = 'https://cse.google.com/cse.js?cx=' + encodeURIComponent(GOOGLE_CSE_ID);
+    script.onerror = () => { window.__cseLoading = false; toast('تعذر تحميل بحث Google. تحقق من إعداد محرك البحث والاتصال.'); };
+    document.head.appendChild(script);
+  }
+
+  $('searchForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const query = $('searchInput').value.trim();
+    if(!query) return;
+    $('results').classList.add('active');
+    loadCSE();
+    const waitForCSE = setInterval(()=>{
+      if(window.google && google.search && google.search.cse && google.search.cse.element){
+        clearInterval(waitForCSE);
+        const element = google.search.cse.element.getElement('standard');
+        if(element){ element.execute(query); }
+        else { toast('محرك البحث لم يجهز بعد. حاول مرة أخرى.'); }
+      }
+    },250);
+    setTimeout(()=>clearInterval(waitForCSE),12000);
+  });
+
+  $('lucky').addEventListener('click',()=>{
+    const q=$('searchInput').value.trim();
+    if(!q){toast('اكتب عبارة البحث أولاً.');return;}
+    window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank','noopener');
+  });
+
+  $('urlBar').addEventListener('keydown',e=>{
+    if(e.key!=='Enter') return;
+    const value=e.target.value.trim();
+    if(!value) return;
+    if(value.includes(' ') || (!value.includes('.') && !value.startsWith('http'))){
+      $('searchInput').value=value; $('searchForm').requestSubmit(); return;
+    }
+    const url=/^https?:\/\//i.test(value)?value:'https://'+value;
+    // شريط العنوان في هذا النموذج يفتح الرابط خارج الصفحة لتجنب حظر iframe من المواقع.
+    window.open(url,'_blank','noopener');
+  });
+
+  $('toggleMirsad').addEventListener('click',()=>{
+    $('mirsadPanel').classList.toggle('hidden'); updateLayout();
+  });
+  $('toggleWorth').addEventListener('click',()=>{
+    $('worthPanel').classList.toggle('hidden'); updateLayout();
+  });
+  function updateLayout(){
+    const main=$('main'), m=!$('mirsadPanel').classList.contains('hidden'), w=!$('worthPanel').classList.contains('hidden');
+    main.classList.toggle('no-sides',!m&&!w);
+    main.classList.toggle('one-side',m!==w);
+  }
+  $('reload').addEventListener('click',()=>location.reload());
+  $('back').addEventListener('click',()=>history.back());
+  $('forward').addEventListener('click',()=>history.forward());
+
+  async function analyze(kind){
+    const isMirsad=kind==='mirsad';
+    const text=$(isMirsad?'mirsadText':'worthText').value.trim();
+    const output=$(isMirsad?'mirsadResult':'worthResult');
+    if(!text){output.textContent='أضف نصاً أولاً.';return;}
+    output.textContent='جاري التحليل...';
+    try{
+      const response=await fetch('/api/analyze',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({text,tool:kind})
+      });
+      const data=await response.json();
+      if(!response.ok) throw new Error(data.error||'تعذر إكمال التحليل');
+      output.textContent=data.analysis||data.result||data.message||'لم تصل نتيجة واضحة.';
+    }catch(err){
+      output.textContent='تعذر الاتصال بخدمة التحليل. تأكد من إعداد الخادم ومفتاح Gemini في Render.\\n\\n'+err.message;
+    }
+  }
+  $('mirsadBtn').addEventListener('click',()=>analyze('mirsad'));
+  $('worthBtn').addEventListener('click',()=>analyze('worth'));
+
+  // عند تحديد نص داخل الصفحة يمكن إرساله مباشرة إلى إحدى الأداتين.
+  document.addEventListener('mouseup',()=>{
+    const selected=window.getSelection()?.toString().trim();
+    if(!selected || selected.length<3) return;
+    $('mirsadText').value=selected;
+    $('worthText').value=selected;
+    toast('تم نسخ النص المحدد إلى حقلي مرصاد ويستحق.');
+  });
+</script>
+</body>
+</html>
