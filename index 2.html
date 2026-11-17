@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SEARCH</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080808;color:#f5f5f5;font-family:Arial,sans-serif}
+header{height:64px;border-bottom:1px solid #292929;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#080808;position:relative;z-index:5}
+.brand{font-size:21px;font-weight:900;letter-spacing:4px}
+.toolbar{display:flex;gap:8px}
+.toggle{background:#242424;color:#eee;border:1px solid #444;padding:9px 13px;border-radius:9px;cursor:pointer}
+.toggle:hover{background:#383838}
+.toggle[aria-expanded="false"]{color:#aaa;border-style:dashed}
+main{position:relative;display:grid;grid-template-columns:285px minmax(0,1fr) 285px;min-height:calc(100vh - 64px);padding-bottom:24px}
+.panel{grid-row:1;padding:18px;background:#17121b;border-inline-start:1px solid #34253b;min-width:0;align-self:stretch;z-index:2}
+.panel.yastahiq{grid-column:1;background:linear-gradient(160deg,#28202b,#151515)}
+.panel.mirsad{grid-column:3;background:linear-gradient(160deg,#24132b,#151018)}
+.panel h2{margin:0;color:#ead9bd;font-size:21px}
+.panel.mirsad h2{color:#f0a1bf}
+.panel-head{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+.mirsad-logo{width:48px;height:48px;object-fit:contain;border-radius:7px;background:#000}
+.sub{font-size:12px;line-height:1.8;color:#b7b1ba;margin-bottom:18px}
+label{display:block;font-size:12px;color:#ccc;margin:13px 0 7px}
+input,textarea{width:100%;padding:12px;background:#0b0b0b;color:#fff;border:1px solid #48404b;border-radius:9px;font:inherit;font-size:13px;outline:none}
+textarea{min-height:110px;resize:vertical}
+.action{width:100%;padding:12px;border:0;border-radius:9px;margin-top:10px;background:#e99bb8;color:#21121a;font-weight:bold;cursor:pointer}
+.yastahiq .action{background:#e8d8bd}
+.out{display:none;white-space:pre-wrap;background:#0b0b0b;border:1px solid #39313c;border-radius:10px;padding:12px;margin-top:13px;font-size:13px;line-height:1.8}
+/* Keep the workspace centered when either or both side panels are hidden. */
+.center{position:absolute;top:0;left:50%;transform:translateX(-50%);width:min(720px,calc(100% - 620px));padding:45px 0 28px;display:flex;align-items:center;flex-direction:column;min-width:0;z-index:1}
+main.one-hidden .center{width:min(720px,calc(100% - 335px))}
+main.both-hidden .center{width:min(720px,calc(100% - 40px))}
+.wordmark{font-size:clamp(42px,7vw,68px);font-weight:900;letter-spacing:9px;margin:4px 0 28px}
+.search{display:flex;background:#fff;border-radius:30px;padding:6px 8px;width:100%;box-shadow:0 4px 22px #0008}
+.search input{border:0;background:transparent;color:#111;font-size:16px;flex:1;min-width:0;padding:12px 15px}
+.search input::placeholder{color:#777}
+.search button{border:0;border-radius:50%;width:42px;background:#eee;color:#222;font-size:20px;cursor:pointer}
+.hint{color:#888;font-size:12px;margin:14px 0 10px;text-align:center}
+.site-feature{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 17px;margin-top:9px;background:#171717;border:1px solid #383838;border-radius:13px;text-decoration:none;color:#fff;transition:.2s}
+.site-feature:hover{background:#222;border-color:#777}
+.site-feature strong{display:block;font-size:15px;margin-bottom:4px}
+.site-feature small{color:#aaa;font-size:11px}
+.site-icon{width:35px;height:35px;border-radius:10px;background:#252525;display:grid;place-items:center;font-size:18px}
+.search-results{display:none;width:100%;margin-top:18px;min-height:180px;background:#fff;color:#222;border-radius:12px;overflow:auto;padding:14px;direction:ltr;text-align:left}
+.search-results.active{display:block}
+.search-results .gcse-searchresults-only{color:#222}
+.search-status{color:#aaa;font-size:12px;line-height:1.8;text-align:center;margin:10px 0}
+.selection-menu{display:none;position:fixed;z-index:30;background:#171717;border:1px solid #555;border-radius:12px;padding:7px;box-shadow:0 8px 28px #000b;gap:7px;direction:rtl}
+.selection-menu.show{display:flex}
+.selection-menu button{border:0;border-radius:8px;padding:9px 12px;font-weight:bold;cursor:pointer;background:#e99bb8;color:#24121b}
+.selection-menu button.worth{background:#e8d8bd;color:#211b12}
+.note{max-width:680px;color:#888;font-size:12px;line-height:1.8;text-align:center;margin-top:22px}
+.hidden{display:none!important}
+@media(max-width:1050px){
+ main{grid-template-columns:245px minmax(0,1fr) 245px}
+ .center{width:min(650px,calc(100% - 540px))}
+ main.one-hidden .center{width:min(650px,calc(100% - 290px))}
+}
+@media(max-width:720px){
+ header{height:auto;min-height:64px;padding:10px 12px;gap:10px;flex-wrap:wrap}
+ .toolbar{gap:6px}
+ .toggle{font-size:11px;padding:8px 9px}
+ main{display:flex;flex-direction:column;min-height:calc(100vh - 64px);padding:0 12px}
+ .center,main.one-hidden .center,main.both-hidden .center{position:relative;left:auto;top:auto;transform:none;order:0;width:100%;padding:35px 0 25px}
+ .panel{order:1;width:100%;margin-bottom:12px}
+ .panel.mirsad{order:2}
+ .wordmark{margin-top:0}
+ .search-results{min-height:220px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">SEARCH</div>
+  <div class="toolbar">
+    <button class="toggle" id="btn-worth" aria-expanded="true" onclick="togglePanel('yastahiq','btn-worth')">إخفاء يستحق</button>
+    <button class="toggle" id="btn-mirsad" aria-expanded="true" onclick="togglePanel('mirsad','btn-mirsad')">إخفاء مرصاد</button>
+  </div>
+</header>
+
+<main id="workspace">
+  <aside class="panel yastahiq" id="yastahiq">
+    <div class="panel-head"><h2>يستحق</h2></div>
+    <div class="sub">قيّم المحتوى وفق اهتمامك، وافهم قيمته ومدى صلته بما تبحث عنه.</div>
+    <label for="interests">اهتماماتك</label>
+    <input id="interests" placeholder="مثال: الإعلام، التقنية، التاريخ">
+    <label for="worthText">المحتوى أو الرابط</label>
+    <textarea id="worthText" placeholder="اكتب وصف المحتوى أو الصق نصه هنا..."></textarea>
+    <button class="action" onclick="analyze('worth')">حلّل المحتوى</button>
+    <div class="out" id="worthOut"></div>
+  </aside>
+
+  <section class="center">
+    <div class="wordmark">SEARCH</div>
+    <form class="search" onsubmit="googleSearch(event)">
+      <input id="q" placeholder="ابحث في Google..." autocomplete="off">
+      <button aria-label="بحث">⌕</button>
+    </form>
+    <div class="hint">تظهر نتائج البحث هنا داخل متصفح SEARCH</div>
+    <div class="search-results" id="searchResults">
+      <div id="searchResultsOnly" class="gcse-searchresults-only"></div>
+    </div>
+    <div class="search-status" id="searchStatus">اكتب عبارة البحث ثم اضغط زر البحث.</div>
+    <a class="site-feature" href="https://fajwah.edgeone.dev" target="_blank" rel="noopener noreferrer">
+      <span><strong>فجوة</strong><small>فتح موقع فجوة</small></span>
+      <span class="site-icon">↗</span>
+    </a>
+    <div class="note">حدد أي نص ظاهر في نتائج البحث لتختار فحصه بمرصاد أو يستحق. التحليل يقدم مؤشرات أولية ولا يُعد تحققًا مستقلًا من المصادر.</div>
+  </section>
+
+  <aside class="panel mirsad" id="mirsad">
+    <div class="panel-head">
+      <img class="mirsad-logo" src="assets/mirsad-logo.png" alt="شعار مرصاد">
+      <h2>مرصاد</h2>
+    </div>
+    <div class="sub">حلّل الخبر والادعاء، وافصل بين المعلومات المؤكدة وما يحتاج إلى تحقق.</div>
+    <label for="newsText">نص الخبر أو الادعاء</label>
+    <textarea id="newsText" placeholder="ألصق الخبر أو الادعاء هنا..."></textarea>
+    <label for="source">رابط المصدر (اختياري)</label>
+    <input id="source" placeholder="https://...">
+    <button class="action" onclick="analyze('mirsad')">حلّل الخبر</button>
+    <div class="out" id="mirsadOut"></div>
+  </aside>
+</main>
+
+<div class="selection-menu" id="selectionMenu" aria-label="إرسال النص للفحص">
+  <button onclick="sendSelection('mirsad')">افحص بمرصاد</button>
+  <button class="worth" onclick="sendSelection('worth')">افحص بيستحق</button>
+</div>
+
+<script>
+const GOOGLE_CSE_ID = 'e6b77fd4721cd4ec2';
+let selectedText = '';
+let googleCSEPromise = null;
+
+function updateLayout() {
+  const main = document.getElementById('workspace');
+  const leftHidden = document.getElementById('yastahiq').classList.contains('hidden');
+  const rightHidden = document.getElementById('mirsad').classList.contains('hidden');
+  main.classList.toggle('both-hidden', leftHidden && rightHidden);
+  main.classList.toggle('one-hidden', leftHidden !== rightHidden);
+}
+
+function togglePanel(id, buttonId) {
+  const panel = document.getElementById(id);
+  const button = document.getElementById(buttonId);
+  const willHide = !panel.classList.contains('hidden');
+  panel.classList.toggle('hidden', willHide);
+  button.setAttribute('aria-expanded', String(!willHide));
+  button.textContent = (willHide ? 'إظهار ' : 'إخفاء ') + (id === 'mirsad' ? 'مرصاد' : 'يستحق');
+  updateLayout();
+}
+
+/*
+  Loads Google Programmable Search once.
+  The Promise prevents duplicate script loads and gives a useful timeout error.
+*/
+function loadGoogleCSE() {
+  if (window.google?.search?.cse?.element) {
+    return Promise.resolve();
+  }
+  if (googleCSEPromise) {
+    return googleCSEPromise;
+  }
+
+  googleCSEPromise = new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = (error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutId);
+      if (error) reject(error);
+      else resolve();
+    };
+
+    const timeoutId = setTimeout(() => {
+      finish(new Error('انتهت مهلة تحميل Google. تحقق من إعدادات محرك البحث والاتصال.'));
+    }, 15000);
+
+    window.__gcse = {
+      parsetags: 'explicit',
+      callback: () => {
+        try {
+          if (!window.google?.search?.cse?.element) {
+            throw new Error('لم تجهز Google عنصر البحث.');
+          }
+
+          const existing = google.search.cse.element.getElement('searchresults');
+          if (!existing) {
+            google.search.cse.element.render({
+              div: 'searchResultsOnly',
+              tag: 'searchresults-only',
+              gname: 'searchresults'
+            });
+          }
+          finish();
+        } catch (error) {
+          finish(error);
+        }
+      }
+    };
+
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://cse.google.com/cse.js?cx=' + encodeURIComponent(GOOGLE_CSE_ID);
+    script.onerror = () => finish(new Error('تعذر تحميل ملف Google CSE. تحقق من الاتصال أو إعدادات Google.'));
+    document.head.appendChild(script);
+  });
+
+  googleCSEPromise.catch(() => {
+    // Permit a later retry if the first load failed.
+    googleCSEPromise = null;
+  });
+
+  return googleCSEPromise;
+}
+
+async function googleSearch(event) {
+  event.preventDefault();
+  const query = document.getElementById('q').value.trim();
+  const results = document.getElementById('searchResults');
+  const status = document.getElementById('searchStatus');
+
+  if (!query) {
+    status.textContent = 'اكتب كلمة أو عبارة للبحث أولاً.';
+    return;
+  }
+
+  results.classList.add('active');
+  status.textContent = 'جارٍ تحميل نتائج Google...';
+
+  try {
+    await loadGoogleCSE();
+
+    const element = google.search.cse.element.getElement('searchresults');
+    if (!element) {
+      throw new Error('لم يتم إنشاء مساحة نتائج Google.');
+    }
+
+    element.execute(query);
+    status.textContent = 'تم إرسال البحث إلى Google.';
+  } catch (error) {
+    status.textContent = 'تعذر تحميل نتائج Google: ' + error.message;
+  }
+}
+
+function showSelectionMenu() {
+  const selection = window.getSelection();
+  const text = selection ? selection.toString().trim() : '';
+  const menu = document.getElementById('selectionMenu');
+  const results = document.getElementById('searchResults');
+
+  if (!selection || text.length < 3 || !selection.anchorNode || !results.contains(selection.anchorNode)) {
+    menu.classList.remove('show');
+    return;
+  }
+
+  selectedText = text;
+  const range = selection.getRangeAt(0);
+  const rect = range.getBoundingClientRect();
+  menu.style.left = Math.max(8, Math.min(window.innerWidth - 250, rect.left + rect.width / 2 - 110)) + 'px';
+  menu.style.top = Math.max(8, Math.min(window.innerHeight - 60, rect.bottom + 8)) + 'px';
+  menu.classList.add('show');
+}
+
+document.addEventListener('mouseup', () => setTimeout(showSelectionMenu, 30));
+document.addEventListener('keyup', event => {
+  if (event.key === 'Escape') {
+    document.getElementById('selectionMenu').classList.remove('show');
+  } else {
+    setTimeout(showSelectionMenu, 30);
+  }
+});
+document.addEventListener('selectionchange', () => {
+  if (!window.getSelection()?.toString().trim()) {
+    document.getElementById('selectionMenu').classList.remove('show');
+  }
+});
+
+function sendSelection(type) {
+  const text = selectedText.trim();
+  if (!text) return;
+
+  const isWorth = type === 'worth';
+  const panelId = isWorth ? 'yastahiq' : 'mirsad';
+  const buttonId = isWorth ? 'btn-worth' : 'btn-mirsad';
+  const panel = document.getElementById(panelId);
+
+  if (panel.classList.contains('hidden')) {
+    togglePanel(panelId, buttonId);
+  }
+
+  document.getElementById(isWorth ? 'worthText' : 'newsText').value = text;
+  document.getElementById('selectionMenu').classList.remove('show');
+  analyze(type);
+}
+
+async function analyze(type) {
+  const isWorth = type === 'worth';
+  const text = document.getElementById(isWorth ? 'worthText' : 'newsText').value.trim();
+  const interests = document.getElementById('interests').value.trim();
+  const source = document.getElementById('source').value.trim();
+  const output = document.getElementById(isWorth ? 'worthOut' : 'mirsadOut');
+
+  if (!text) {
+    alert('أدخل المحتوى أولاً');
+    return;
+  }
+
+  output.style.display = 'block';
+  output.textContent = 'جارٍ التحليل...';
+
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type, text, interests, source})
+    });
+
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      throw new Error('استجابة الخادم ليست بصيغة صحيحة.');
+    }
+
+    if (!response.ok) {
+      throw new Error(data.error || 'تعذر إكمال التحليل.');
+    }
+
+    output.textContent = data.result || 'لم يصل نص التحليل من الخادم.';
+  } catch (error) {
+    output.textContent = 'تعذر الاتصال بالخادم: ' + error.message +
+      '\nتأكد من تشغيل server.js وإعداد GEMINI_API_KEY في Render Environment.';
+  }
+}
+</script>
+</body>
+</html>
