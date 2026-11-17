@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SEARCH</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#080808;color:#f5f5f5;font-family:Arial,sans-serif}
+header{height:64px;border-bottom:1px solid #292929;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#080808}
+.brand{font-size:21px;font-weight:900;letter-spacing:4px}.toolbar{display:flex;gap:8px}
+.toggle{background:#242424;color:#eee;border:1px solid #444;padding:9px 13px;border-radius:9px;cursor:pointer}
+.toggle:hover{background:#383838}.toggle[aria-expanded="false"]{color:#aaa;border-style:dashed}
+main{display:grid;grid-template-columns:285px minmax(0,1fr) 285px;min-height:calc(100vh - 64px)}
+.panel{padding:18px;background:#17121b;border-inline-start:1px solid #34253b;min-width:0}
+.panel.mirsad{background:linear-gradient(160deg,#24132b,#151018)}
+.panel.yastahiq{background:linear-gradient(160deg,#28202b,#151515)}
+.panel h2{margin:0;color:#ead9bd;font-size:21px}.panel.mirsad h2{color:#f0a1bf}
+.panel-head{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+.mirsad-logo{width:48px;height:48px;object-fit:contain;border-radius:7px;background:#000}
+.sub{font-size:12px;line-height:1.8;color:#b7b1ba;margin-bottom:18px}
+label{display:block;font-size:12px;color:#ccc;margin:13px 0 7px}
+input,textarea{width:100%;padding:12px;background:#0b0b0b;color:#fff;border:1px solid #48404b;border-radius:9px;font:inherit;font-size:13px;outline:none}
+textarea{min-height:110px;resize:vertical}
+.action{width:100%;padding:12px;border:0;border-radius:9px;margin-top:10px;background:#e99bb8;color:#21121a;font-weight:bold;cursor:pointer}
+.yastahiq .action{background:#e8d8bd}
+.out{display:none;white-space:pre-wrap;background:#0b0b0b;border:1px solid #39313c;border-radius:10px;padding:12px;margin-top:13px;font-size:13px;line-height:1.8}
+.center{padding:45px 24px;display:flex;align-items:center;flex-direction:column;min-width:0}
+.wordmark{font-size:clamp(42px,7vw,68px);font-weight:900;letter-spacing:9px;margin:4px 0 28px}
+.search{display:flex;background:#fff;border-radius:30px;padding:6px 8px;width:min(720px,100%);box-shadow:0 4px 22px #0008}
+.search input{border:0;background:transparent;color:#111;font-size:16px;flex:1;min-width:0;padding:12px 15px}
+.search input::placeholder{color:#777}.search button{border:0;border-radius:50%;width:42px;background:#eee;color:#222;font-size:20px;cursor:pointer}
+.hint{color:#888;font-size:12px;margin:14px 0 10px}
+.site-feature{width:min(720px,100%);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 17px;margin-top:9px;background:#171717;border:1px solid #383838;border-radius:13px;text-decoration:none;color:#fff;transition:.2s}
+.site-feature:hover{background:#222;border-color:#777}
+.site-feature strong{display:block;font-size:15px;margin-bottom:4px}.site-feature small{color:#aaa;font-size:11px}
+.site-icon{width:35px;height:35px;border-radius:10px;background:#252525;display:grid;place-items:center;font-size:18px}
+.links{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin:17px}
+.links a{color:#ddd;text-decoration:none;background:#1c1c1c;border:1px solid #333;border-radius:20px;padding:9px 14px;font-size:12px}
+.note{max-width:680px;color:#888;font-size:12px;line-height:1.8;text-align:center;margin-top:28px}
+.hidden{display:none!important}
+@media(max-width:900px){main{grid-template-columns:240px minmax(0,1fr) 240px}}
+@media(max-width:720px){main{display:flex;flex-direction:column}.center{order:0;padding:35px 16px}.panel{order:1}.wordmark{margin-top:0}}
+</style></head>
+<body>
+<header><div class="brand">SEARCH</div><div class="toolbar">
+<button class="toggle" id="btn-worth" aria-expanded="true" onclick="togglePanel('yastahiq','btn-worth')">إخفاء يستحق</button>
+<button class="toggle" id="btn-mirsad" aria-expanded="true" onclick="togglePanel('mirsad','btn-mirsad')">إخفاء مرصاد</button>
+</div></header>
+<main>
+<aside class="panel yastahiq" id="yastahiq">
+<div class="panel-head"><h2>يستحق</h2></div>
+<div class="sub">قيّم المحتوى وفق اهتمامك، وافهم قيمته ومدى صلته بما تبحث عنه.</div>
+<label>اهتماماتك</label><input id="interests" placeholder="مثال: الإعلام، التقنية، التاريخ">
+<label>المحتوى أو الرابط</label><textarea id="worthText" placeholder="اكتب وصف المحتوى أو الصق نصه هنا..."></textarea>
+<button class="action" onclick="analyze('worth')">حلّل المحتوى</button><div class="out" id="worthOut"></div>
+</aside>
+<section class="center">
+<div class="wordmark">SEARCH</div>
+<form class="search" onsubmit="googleSearch(event)"><input id="q" placeholder="ابحث في Google..." autocomplete="off"><button aria-label="بحث">⌕</button></form>
+<div class="hint">اكتب ما تبحث عنه لفتح نتائج Google مباشرة</div>
+<a class="site-feature" href="https://fajwah.edgeone.dev" target="_blank" rel="noopener noreferrer">
+<span><strong>فجوة</strong><small>فتح موقع فجوة</small></span><span class="site-icon">↗</span>
+</a>
+<nav class="links"><a href="https://news.google.com" target="_blank" rel="noopener">Google News</a><a href="https://www.youtube.com" target="_blank" rel="noopener">YouTube</a><a href="https://www.google.com" target="_blank" rel="noopener">Google</a></nav>
+<div class="note">SEARCH واجهة خاصة. البحث يفتح نتائج Google في تبويب جديد. تحليلات مرصاد ويستحق تعمل عبر Gemini من خلال الخادم، ولا يظهر مفتاح API في المتصفح.</div>
+</section>
+<aside class="panel mirsad" id="mirsad">
+<div class="panel-head"><img class="mirsad-logo" src="assets/mirsad-logo.png" alt="شعار مرصاد"><h2>مرصاد</h2></div>
+<div class="sub">حلّل الخبر والادعاء، وافصل بين المعلومات المؤكدة وما يحتاج إلى تحقق.</div>
+<label>نص الخبر أو الادعاء</label><textarea id="newsText" placeholder="ألصق الخبر أو الادعاء هنا..."></textarea>
+<label>رابط المصدر (اختياري)</label><input id="source" placeholder="https://...">
+<button class="action" onclick="analyze('mirsad')">حلّل الخبر</button><div class="out" id="mirsadOut"></div>
+</aside>
+</main>
+<script>
+function togglePanel(id,buttonId){
+ const panel=document.getElementById(id),btn=document.getElementById(buttonId);
+ const willHide=!panel.classList.contains('hidden');
+ panel.classList.toggle('hidden',willHide);
+ btn.setAttribute('aria-expanded',String(!willHide));
+ btn.textContent=(willHide?'إظهار ':'إخفاء ')+(id==='mirsad'?'مرصاد':'يستحق');
+}
+function googleSearch(e){e.preventDefault();const q=document.getElementById('q').value.trim();if(q)window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank','noopener')}
+async function analyze(type){
+ const worth=type==='worth',text=document.getElementById(worth?'worthText':'newsText').value.trim();
+ const interests=document.getElementById('interests').value.trim(),source=document.getElementById('source').value.trim();
+ const out=document.getElementById(worth?'worthOut':'mirsadOut');
+ if(!text){alert('أدخل المحتوى أولاً');return}
+ out.style.display='block';out.textContent='جارٍ التحليل...';
+ try{const r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,text,interests,source})});
+ const d=await r.json();if(!r.ok)throw new Error(d.error||'تعذر إكمال التحليل');out.textContent=d.result;
+ }catch(e){out.textContent='تعذر الاتصال بالخادم: '+e.message+'\nتأكد من تشغيل server.js وإعداد مفتاح Gemini في ملف .env.'}
+}
+</script></body></html>
