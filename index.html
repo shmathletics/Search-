@@ -150,7 +150,3 @@ async function analyze(type){
  const d=await r.json();if(!r.ok)throw new Error(d.error||'تعذر إكمال التحليل');out.textContent=d.result;
  }catch(e){out.textContent='تعذر الاتصال بالخادم: '+e.message+'\nتأكد من تشغيل server.js وإعداد مفتاح Gemini في Render Environment.'}
 }
-</script></body></html>
-<script async src="https://cse.google.com/cse.js?cx=e6b77fd4721cd4ec2">
-</script>
-<div class="gcse-search"></div>
