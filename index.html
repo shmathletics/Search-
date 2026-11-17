@@ -261,6 +261,17 @@
     $('worthText').value=selected;
     toast('تم نسخ النص المحدد إلى حقلي مرصاد ويستحق.');
   });
+// إخفاء وإظهار لوحة مرصاد
+document.getElementById('toggleMirsad').onclick = () => {
+  document.getElementById('mirsadPanel').classList.toggle('hidden');
+  updateLayout();
+};
+
+// إخفاء وإظهار لوحة يستحق
+document.getElementById('toggleWorth').onclick = () => {
+  document.getElementById('worthPanel').classList.toggle('hidden');
+  updateLayout();
+};
 </script>
 </body>
 </html>
