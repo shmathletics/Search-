@@ -65,7 +65,18 @@
     .results .gcse-search{color:#202124;background:white;border-radius:12px;padding:12px;min-height:120px}
     .below-note{font-size:11px;color:#777f89;margin-top:auto;padding-top:36px;text-align:center}
     .hidden{display:none!important}
-    .main.one-side{grid-template-columns:minmax(0,1fr) 260px}
+.main.one-side {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.main.no-sides {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.main.one-side .center,
+.main.no-sides .center {
+  width: 100%;
+}
     .main.no-sides{grid-template-columns:minmax(0,1fr)}
     .main.one-side .center,.main.no-sides .center{width:100%}
     .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#303134;color:#e8eaed;border:1px solid #5f6368;border-radius:20px;padding:10px 15px;font-size:12px;box-shadow:var(--shadow);display:none;z-index:10}
@@ -217,7 +228,28 @@
     window.open(url,'_blank','noopener');
   });
 
-  $('toggleMirsad').addEventListener('click',()=>{
+// إخفاء وإظهار اللوحات
+function updateLayout() {
+  const mirsad = $('mirsadPanel');
+  const worth = $('worthPanel');
+  const main = $('main');
+
+  const mHidden = mirsad.classList.contains('hidden');
+  const wHidden = worth.classList.contains('hidden');
+
+  main.classList.toggle('no-sides', mHidden && wHidden);
+  main.classList.toggle('one-side', mHidden !== wHidden);
+}
+
+$('toggleMirsad').addEventListener('click', () => {
+  $('mirsadPanel').classList.toggle('hidden');
+  updateLayout();
+});
+
+$('toggleWorth').addEventListener('click', () => {
+  $('worthPanel').classList.toggle('hidden');
+  updateLayout();
+});
     $('mirsadPanel').classList.toggle('hidden'); updateLayout();
   });
   $('toggleWorth').addEventListener('click',()=>{
